@@ -84,7 +84,7 @@ async function run() {
     }
     console.log('shutting down');
     await client.end();
-    //await execAsync('shutdown now');
+    await execAsync('shutdown now');
   }
 }
 
