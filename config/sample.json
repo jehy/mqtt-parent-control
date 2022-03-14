@@ -1,0 +1,13 @@
+{
+  "options": {
+    "clientId": "some-id",
+    "username": "name",
+    "password": "password"
+  },
+  "url": "http://example.com",
+  "topicOnline": "home/note/online",
+  "topicShutdown": "home/note/shutdown",
+  "topicDelay": "home/note/delay",
+  "topicNetwork": "home/note/net",
+  "net" : "Home Wifi"
+}
