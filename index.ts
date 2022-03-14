@@ -72,7 +72,7 @@ async function run() {
     await client.end();
     return;
   }
-  const shutDownByTime = time < 7 || time > 22;
+  const shutDownByTime = time < 7 || time > 21;
   const shutDown = shutDownByTime;
   if (shutDown) {
     try {
