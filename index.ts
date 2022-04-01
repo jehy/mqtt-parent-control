@@ -28,10 +28,7 @@ const execAsync = promisify(exec);
 async function checkNet(client: mqtt.AsyncClient) {
   const res = await execAsync('iwgetid -r');
   const net = res.stdout.trim();
-  if (net && net !== config.net) {
-    console.log(`New net ${net}`);
-    await client.publish(config.topicNetwork, net);
-  }
+  await client.publish(config.topicNetwork, net);
 }
 
 async function run() {
