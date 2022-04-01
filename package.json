@@ -1,6 +1,6 @@
 {
   "name": "mqtt-parent-control",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "",
   "main": "bundle.js",
   "scripts": {
@@ -18,8 +18,7 @@
     "config": "3.3.7",
     "dayjs": "1.11.0",
     "debug": "4.3.4",
-    "mqtt": "4.3.7",
-    "process-list": "2.0.0"
+    "mqtt": "4.3.7"
   },
   "devDependencies": {
     "@types/config": "0.0.41",

@@ -17,7 +17,7 @@ export default class GetByShell extends Task {
 
   public command: string;
 
-  public usage: PromiseWithChild<{ stdout: string; stderr: string; }>;
+  public shellResut: PromiseWithChild<{ stdout: string; stderr: string; }>;
 
   constructor(config: any, options: TaskOptions) {
     super(options);
@@ -29,11 +29,11 @@ export default class GetByShell extends Task {
   }
 
   public async start():Promise<void> {
-    this.usage = execAsync(this.command);
+    this.shellResut = execAsync(this.command);
   }
 
   public async end(): Promise<void> {
-    const network = (await this.usage).stdout.trim();
-    await this.client.publish(this.config.topic, network);
+    const result = (await this.shellResut).stdout.trim();
+    await this.client.publish(this.config.topic, result);
   }
 }
