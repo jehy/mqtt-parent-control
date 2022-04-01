@@ -1,46 +1,63 @@
 import * as mqtt from 'async-mqtt';
 // @ts-ignore
 import configModule from 'config';
-import dayjs from 'dayjs';
 // @ts-ignore
-import { exec } from 'child_process';
 import { promisify } from 'util';
 
+import tasks from './tasks/index';
+
+import type Task from './tasks/Task';
+import type { TasksConfig, TaskType } from './tasks/Task';
+
 type Config = {
-  'options': {
-    'clientId': string,
-    'username': string,
-    'password': string
-  },
-  'url': string,
-  'topicOnline': string,
-  'topicShutdown': string,
-  'topicDelay': string,
-  topicNetwork: string,
-  net: string,
+  mqtt: {
+    options: {
+      clientId: string,
+      username: string,
+      password: string
+    },
+    url: string,
+  }
+  tasksConfig: TasksConfig,
+  logTopic: string,
 };
 
 const config = configModule as unknown as Config;
 const sleep = (time: number) => promisify(setTimeout)(time);
-// @ts-ignore
-const execAsync = promisify(exec);
 
-async function checkNet(client: mqtt.AsyncClient) {
-  const res = await execAsync('iwgetid -r');
-  const net = res.stdout.trim();
-  await client.publish(config.topicNetwork, net);
+async function withFallBack(task: Task, fn: Function, logs: Array<string>) {
+  try {
+    await fn.apply(task);
+    // @ts-ignore
+  } catch (err: Error) {
+    logs.push(`${task.name}: ${err.message} ${err.stack}`);
+  }
 }
 
 async function run() {
-  const client = mqtt.connect(config.url, config.options);
+  const { tasksConfig } = config;
+  let logs:Array<string> = [];
+  const client = mqtt.connect(config.mqtt.url, config.mqtt.options);
+  const tasksObjects: Array<Task> = Object.entries(tasksConfig).map((el) => {
+    const name: TaskType = el[0] as TaskType;
+    const taskConfig: any = el[1];
+    if (!tasks[name]) {
+      logs.push(`Class for ${name} not found!`);
+      return false;
+    }
+    const task = new tasks[name](taskConfig, { client });
+    if (!task.enabled && task.logs) {
+      logs = logs.concat(task.logs);
+    }
+    if (!task.enabled) {
+      return false;
+    }
+    return task;
+  }).filter((el) => el) as Array<Task>;
+  console.log(`running ${tasksObjects.length} tasks`);
 
-  const time = parseInt(dayjs().format('HH'), 10);
-  console.log(`Time ${time}`);
   const connection = new Promise((resolve) => {
     client.on('connect', () => {
-      console.log('connected');
-      client.publish(config.topicOnline, '1');
-      checkNet(client);
       resolve(true);
     });
     client.on('error', (err) => {
@@ -48,43 +65,17 @@ async function run() {
       resolve(false);
     });
   });
-  const connected = await Promise.race([connection, sleep(10000)]);
-  const shouldDelay = new Promise(((resolve) => {
-    if (!connected) {
-      resolve(false);
-      return;
-    }
-    client.subscribe(config.topicDelay);
-    client.on('message', (topic, message) => {
-      if (topic === config.topicDelay && message.toString() === '1') {
-        resolve(true);
-        return;
-      }
-      resolve(false);
-    });
-  }));
-  const delay = await Promise.race([shouldDelay, sleep(10000)]);
-  console.log(`delay: ${delay}`);
-  if (delay) {
-    await client.end();
-    return;
+  await Promise.race([connection, sleep(10000)]);
+  await Promise.all(tasksObjects.map((task) => withFallBack(task, task.start, logs)));
+  await Promise.all(tasksObjects.map((task) => withFallBack(task, task.end, logs)));
+  logs = tasksObjects.reduce((res, task) => res.concat(task.logs), logs);
+  if (logs.length) {
+    console.log(logs);
+    await client.publish(config.logTopic, logs.join('\n'));
   }
-  const shutDownByTime = time < 7 || time > 21;
-  const shutDown = shutDownByTime;
-  if (shutDown) {
-    try {
-      if (connected) {
-        await client.publish(config.topicShutdown, '1');
-      }
-    } catch (err) {
-      console.log(err);
-    }
-    console.log('shutting down');
-    await client.end();
-    await execAsync('shutdown now');
-  }
+  await client.end();
 }
 
 run()
   .then(() => process.exit(0))
-  .catch(() => process.exit(1));
+  .catch((err) => { console.log(err); process.exit(1); });

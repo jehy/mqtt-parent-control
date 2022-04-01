@@ -1,13 +1,31 @@
 {
-  "options": {
-    "clientId": "some-id",
-    "username": "name",
-    "password": "password"
+  "mqtt": {
+    "options": {
+      "clientId": "some-id",
+      "username": "name",
+      "password": "password"
+    },
+    "url": "tls://example.com:8883"
   },
-  "url": "http://example.com",
-  "topicOnline": "home/note/online",
-  "topicShutdown": "home/note/shutdown",
-  "topicDelay": "home/note/delay",
-  "topicNetwork": "home/note/net",
-  "net" : "Home Wifi"
+  "logTopic": "home/note/logs",
+  "tasksConfig": {
+    "CheckProcess": {
+      "topic": "home/note/steam",
+      "process": "steam"
+    },
+    "GetNetwork": {
+      "topic": "home/note/net"
+    },
+    "GetCpuUsage": {
+      "topic": "home/note/cpu"
+    },
+    "SetOnline": {
+      "topic": "home/note/online"
+    },
+    "TimeControl": {
+      "topicDelay": "home/note/delay",
+      "topicShutdown": "home/note/shutdown",
+      "allowedTime": [7, 22]
+    }
+  }
 }
