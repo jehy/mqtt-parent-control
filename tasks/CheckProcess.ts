@@ -37,7 +37,10 @@ export default class CheckProcess extends Task {
   }
 
   public async end(): Promise<void> {
-    const result = (await this.shellResult).stdout.trim();
-    await this.client.publish(this.config.topic, result ? '1' : '0');
+    const result = (await this.shellResult).stdout
+      .trim()
+      .split('\n')
+      .filter((el) => !el.includes(`grep ${this.config.process}`));
+    await this.client.publish(this.config.topic, result.length === 0 ? '0' : '1');
   }
 }
