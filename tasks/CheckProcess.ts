@@ -15,7 +15,7 @@ const execAsync = promisify(exec);
 export default class CheckProcess extends Task {
   public name:TaskType = 'CheckProcess';
 
-  public shellResut: PromiseWithChild<{ stdout: string; stderr: string; }>;
+  public shellResult: PromiseWithChild<{ stdout: string; stderr: string; }>;
 
   public config: CheckProcessConfig;
 
@@ -33,11 +33,11 @@ export default class CheckProcess extends Task {
   }
 
   public async start():Promise<void> {
-    this.shellResut = execAsync(`ps aux | grep ${this.config.process}`);
+    this.shellResult = execAsync(`ps aux | grep ${this.config.process}`);
   }
 
   public async end(): Promise<void> {
-    const result = (await this.shellResut).stdout.trim();
+    const result = (await this.shellResult).stdout.trim();
     await this.client.publish(this.config.topic, result ? '1' : '0');
   }
 }
