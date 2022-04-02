@@ -25,7 +25,7 @@
     "TimeControl": {
       "topicDelay": "home/note/delay",
       "topicShutdown": "home/note/shutdown",
-      "allowedTime": [7, 22]
+      "allowedTime": [{"start": 7, "end": 22}]
     }
   }
 }
