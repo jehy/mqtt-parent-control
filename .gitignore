@@ -3,7 +3,5 @@ node_modules/
 config/runtime.json
 build
 dist
-*.js
-*.js.map
 tmp
 coverage

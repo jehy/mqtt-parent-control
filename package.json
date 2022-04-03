@@ -1,11 +1,11 @@
 {
   "name": "mqtt-parent-control",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "",
-  "main": "bundle.js",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node ./index.js",
+    "start": "node ./build/index.js",
     "restart": "npm run build && npm start",
     "clean": "rm tmp/* -f",
     "lint": "eslint . --ext .ts",

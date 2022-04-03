@@ -16,6 +16,6 @@ describe('GetCpuUsage', () => {
     await task.end();
     const number = parseInt(result, 10);
     expect(number).not.toBeNaN();
-    expect(number).toBeGreaterThan(0);
+    expect(number).toBeGreaterThanOrEqual(0);
   });
 });

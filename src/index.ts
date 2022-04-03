@@ -4,7 +4,7 @@ import configModule from 'config';
 // @ts-ignore
 import { promisify } from 'util';
 
-import tasks from './tasks/index';
+import tasks from './tasks';
 
 import type Task from './tasks/Task';
 import type { TasksConfig, TaskType } from './tasks/Task';
