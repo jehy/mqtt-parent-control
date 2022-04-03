@@ -65,7 +65,7 @@ export default class TimeControl extends Task {
     const time = parseInt(dayjs().format('HH'), 10);
     console.log(`Time ${time}`);
     const allowedTime = this.config.allowedTime as Array<{ start: number, end: number }>;
-    const allowed = allowedTime.find((interval) => interval.start <= time && time <= interval.end);
+    const allowed = allowedTime.find((interval) => interval.start < time && time < interval.end);
     if (allowed) {
       return;
     }

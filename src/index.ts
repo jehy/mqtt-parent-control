@@ -54,14 +54,14 @@ async function run() {
     }
     return task;
   }).filter((el) => el) as Array<Task>;
-  console.log(`running ${tasksObjects.length} tasks`);
+  console.log(`${new Date().toString()} running ${tasksObjects.length} tasks`);
 
   const connection = new Promise((resolve) => {
     client.on('connect', () => {
       resolve(true);
     });
     client.on('error', (err) => {
-      console.log('error', err);
+      console.log(`${new Date().toString()} error`, err);
       resolve(false);
     });
   });
@@ -70,7 +70,7 @@ async function run() {
   await Promise.all(tasksObjects.map((task) => withFallBack(task, task.end, logs)));
   logs = tasksObjects.reduce((res, task) => res.concat(task.logs), logs);
   if (logs.length) {
-    console.log(logs);
+    console.log(`${new Date().toString()} ${logs.join('\n')}`);
     await client.publish(config.logTopic, logs.join('\n'));
   }
   await client.end();
