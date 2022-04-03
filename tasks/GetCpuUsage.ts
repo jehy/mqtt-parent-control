@@ -1,9 +1,34 @@
-import GetByShell from './GetByShell';
+import Task from './Task';
+import { getCPULoadAVG } from '../lib/cpu';
 
-import type { TaskType } from './Task';
+import type { TaskOptions } from './Task';
 
-export default class GetCpuUsage extends GetByShell {
-  public name:TaskType = 'GetCpuUsage';
+export type GetCpuUsageConfig = {
+  topic: string,
+};
 
-  public command: string = 'echo $[100-$(vmstat 1 2|tail -1|awk \'{print $15}\')]';
+export default class GetCpuUsage extends Task {
+  public config: GetCpuUsageConfig;
+
+  public command: string;
+
+  public cpuUsage: Promise<number>;
+
+  constructor(config: any, options: TaskOptions) {
+    super(options);
+    this.config = config;
+    if (!this.config.topic) {
+      this.enabled = false;
+      this.logs.push('topic not found');
+    }
+  }
+
+  public async start():Promise<void> {
+    this.cpuUsage = getCPULoadAVG(1000, 100);
+  }
+
+  public async end(): Promise<void> {
+    const result = (await this.cpuUsage).toString(10);
+    await this.client.publish(this.config.topic, result);
+  }
 }
