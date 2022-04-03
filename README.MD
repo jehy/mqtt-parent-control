@@ -1,12 +1,20 @@
-# Child MQQT
+# MQQT parent control
 
-Simple daemon which checks current time and shutdowns computer if it is too late.
+[![Build](https://github.com/jehy/mqtt-parent-control/workflows/Build/badge.svg)](https://github.com/jehy/mqtt-parent-control/actions/workflows/main.yml)
 
-Also it seens information about current network and shutdown action.
+
+Several utilities for parent control over MQQT:
+
+1. Shutdown computer when use in non allowed time.
+2. Check for running of exact process (Linux only).
+3. Get CPU Usage.
+4. Get WiFi network
+5. Set online status when computer is turned on
 
 To use:
-1. Copy `config/sample.json` to `config/runtime.json`
-2. Edit values in `runtime.json`
-3. Run `npm run build`
-4. Test it with `npm start`
-5. Add it to cron, like `node ./index.js`
+1. Clone repo
+2. Copy `config/sample.json` to `config/runtime.json`
+3. Edit values in `runtime.json`
+4. Run `npm run build`
+5. Test it with `npm start`
+6. Add it to cron, like `node ./index.js`
