@@ -12,6 +12,7 @@ export type TimeControlConfig = {
   allowedTime: Array<{ start: number, end: number }>,
   topicShutdown: string,
   topicDelay: string,
+  topicForceOff: string,
 };
 
 function shutdown() {
@@ -29,6 +30,8 @@ export default class TimeControl extends Task {
 
   public delay: Promise<boolean>;
 
+  public forceOff: Promise<boolean>;
+
   constructor(config: any, options: TaskOptions) {
     super(options);
     this.config = config;
@@ -36,6 +39,10 @@ export default class TimeControl extends Task {
     if (!this.config.topicDelay) {
       this.enabled = false;
       this.logs.push('topicDelay topic not found');
+    }
+    if (!this.config.topicForceOff) {
+      this.enabled = false;
+      this.logs.push('topicForceOff topic not found');
     }
     if (!this.config.topicShutdown) {
       this.enabled = false;
@@ -47,8 +54,11 @@ export default class TimeControl extends Task {
     }
   }
 
-  public async start():Promise<void> {
-    await this.client.subscribe(this.config.topicDelay);
+  public async start(): Promise<void> {
+    await Promise.all([
+      this.client.subscribe(this.config.topicDelay),
+      this.client.subscribe(this.config.topicForceOff)
+    ]);
     this.delay = new Promise((resolve, reject) => {
       setTimeout(() => reject(), 10000);
       this.client.on('message', (topic, message) => {
@@ -59,9 +69,25 @@ export default class TimeControl extends Task {
         resolve(false);
       });
     });
+    this.forceOff = new Promise((resolve, reject) => {
+      setTimeout(() => reject(), 10000);
+      this.client.on('message', (topic, message) => {
+        if (topic === this.config.topicForceOff && message.toString() === '1') {
+          resolve(true);
+          return;
+        }
+        resolve(false);
+      });
+    });
   }
 
   public async end(): Promise<void> {
+    const forceOff = await this.forceOff;
+    if(forceOff) {
+      await this.client.publish(this.config.topicShutdown, '1');
+      setTimeout(() => shutdown(), 1000);
+      return;
+    }
     const time = parseInt(dayjs().format('HH'), 10);
     console.log(`Time ${time}`);
     const allowedTime = this.config.allowedTime as Array<{ start: number, end: number }>;
@@ -69,6 +95,7 @@ export default class TimeControl extends Task {
     if (allowed) {
       return;
     }
+
     const delay = await this.delay;
     if (!delay) {
       await this.client.publish(this.config.topicShutdown, '1');
