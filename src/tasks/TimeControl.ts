@@ -62,7 +62,10 @@ export default class TimeControl extends Task {
     this.delay = new Promise((resolve) => {
       setTimeout(() => resolve(false), 10000);
       this.client.on('message', (topic, message) => {
-        if (topic === this.config.topicDelay && message.toString() === '1') {
+        if (topic !== this.config.topicDelay) {
+          return;
+        }
+        if (message.toString() === '1') {
           resolve(true);
           return;
         }
@@ -72,7 +75,10 @@ export default class TimeControl extends Task {
     this.forceOff = new Promise((resolve) => {
       setTimeout(() => resolve(false), 10000);
       this.client.on('message', (topic, message) => {
-        if (topic === this.config.topicForceOff && message.toString() === '1') {
+        if (topic !== this.config.topicForceOff) {
+          return;
+        }
+        if (message.toString() === '1') {
           resolve(true);
           return;
         }
