@@ -57,7 +57,7 @@ export default class TimeControl extends Task {
   public async start(): Promise<void> {
     await Promise.all([
       this.client.subscribe(this.config.topicDelay),
-      this.client.subscribe(this.config.topicForceOff)
+      this.client.subscribe(this.config.topicForceOff),
     ]);
     this.delay = new Promise((resolve) => {
       setTimeout(() => resolve(false), 10000);
@@ -89,7 +89,7 @@ export default class TimeControl extends Task {
 
   public async end(): Promise<void> {
     const forceOff = await this.forceOff;
-    if(forceOff) {
+    if (forceOff) {
       await this.client.publish(this.config.topicShutdown, '1');
       setTimeout(() => shutdown(), 1000);
       return;
