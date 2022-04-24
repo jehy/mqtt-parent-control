@@ -13,6 +13,7 @@ export type TimeControlConfig = {
   topicShutdown: string,
   topicDelay: string,
   topicForceOff: string,
+  onlineOnly: boolean,
 };
 
 function shutdown() {
@@ -88,24 +89,25 @@ export default class TimeControl extends Task {
   }
 
   public async end(): Promise<void> {
+    let shouldShutdown = false;
     const forceOff = await this.forceOff;
     if (forceOff) {
-      await this.client.publish(this.config.topicShutdown, '1');
-      setTimeout(() => shutdown(), 1000);
-      return;
+      shouldShutdown = true;
     }
+    const delay = await this.delay;
     const time = parseInt(dayjs().format('HH'), 10);
     console.log(`Time ${time}`);
     const allowedTime = this.config.allowedTime as Array<{ start: number, end: number }>;
     const allowed = allowedTime.find((interval) => interval.start < time && time < interval.end);
-    if (allowed) {
-      return;
+    if (!allowed && !delay) {
+      shouldShutdown = true;
     }
-
-    const delay = await this.delay;
-    if (!delay) {
-      await this.client.publish(this.config.topicShutdown, '1');
+    if(this.config.onlineOnly && !this.client.connected){
+      shouldShutdown = true;
+    }
+    if(shouldShutdown){
       setTimeout(() => shutdown(), 1000);
+      await this.client.publish(this.config.topicShutdown, '1');
     }
   }
 }

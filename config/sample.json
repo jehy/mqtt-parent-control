@@ -26,7 +26,8 @@
       "topicDelay": "home/note/delay",
       "topicForceOff": "home/note/forceoff",
       "topicShutdown": "home/note/shutdown",
-      "allowedTime": [{"start": 7, "end": 22}]
+      "allowedTime": [{"start": 7, "end": 22}],
+      "onlineOnly": true
     }
   }
 }
