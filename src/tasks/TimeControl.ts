@@ -102,10 +102,10 @@ export default class TimeControl extends Task {
     if (!allowed && !delay) {
       shouldShutdown = true;
     }
-    if(this.config.onlineOnly && !this.client.connected){
+    if (this.config.onlineOnly && !this.client.connected) {
       shouldShutdown = true;
     }
-    if(shouldShutdown){
+    if (shouldShutdown) {
       setTimeout(() => shutdown(), 1000);
       await this.client.publish(this.config.topicShutdown, '1');
     }
