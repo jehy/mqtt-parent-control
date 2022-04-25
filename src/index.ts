@@ -79,7 +79,9 @@ async function run() {
   });
   await Promise.race([connection, sleep(10000)]);
   await Promise.all(tasksObjects.map((task) => withFallBack(task, task.start, logs)));
+  console.log('ran start');
   await Promise.all(tasksObjects.map((task) => withFallBack(task, task.end, logs)));
+  console.log('ran end');
   logs = tasksObjects.reduce((res, task) => res.concat(task.logs), logs);
   if (logs.length) {
     console.log(`${new Date().toString()} ${logs.join('\n')}`);
