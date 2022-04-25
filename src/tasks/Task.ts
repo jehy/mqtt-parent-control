@@ -1,8 +1,8 @@
+import type { IMQTTAdapter } from '../IMQTTAdapter';
 import type { CheckProcessConfig } from './CheckProcess';
 import type { GetByShellConfig } from './GetByShell';
 import type { SetOnlineConfig } from './SetOnline';
 import type { TimeControlConfig } from './TimeControl';
-import {IMQTTAdapter} from "../IMQTTAdapter";
 
 export type TaskOptions = { client: IMQTTAdapter };
 

@@ -5,11 +5,11 @@ import configModule from 'config';
 import { promisify } from 'util';
 
 import tasks from './tasks';
+import { DummyMqttClient } from './DummyMqttClient';
 
+import type { IMQTTAdapter } from './IMQTTAdapter';
 import type Task from './tasks/Task';
 import type { TasksConfig, TaskType } from './tasks/Task';
-import {IMQTTAdapter} from "./IMQTTAdapter";
-import {DummyMqttClient} from "./DummyMqttClient";
 
 type Config = {
   mqtt: {
@@ -36,14 +36,12 @@ async function withFallBack(task: Task, fn: Function, logs: Array<string>) {
   }
 }
 
-
-
 async function run() {
-  let client:  IMQTTAdapter; //AsyncMqttClient;//
+  let client: IMQTTAdapter; // AsyncMqttClient;//
   let logs:Array<string> = [];
-  try{
+  try {
     client = mqtt.connect(config.mqtt.url, config.mqtt.options);
-  } catch(err){
+  } catch (err) {
     logs.push('MQTT connect failed', (err as Error).toString());
     client = new DummyMqttClient();
   }
@@ -67,7 +65,7 @@ async function run() {
   console.log(`${new Date().toString()} running ${tasksObjects.length} tasks`);
 
   const connection = new Promise((resolve) => {
-    if(!client) {
+    if (!client) {
       resolve(false);
       return;
     }
@@ -85,9 +83,9 @@ async function run() {
   logs = tasksObjects.reduce((res, task) => res.concat(task.logs), logs);
   if (logs.length) {
     console.log(`${new Date().toString()} ${logs.join('\n')}`);
-      await client.publish(config.logTopic, logs.join('\n'));
+    await client.publish(config.logTopic, logs.join('\n'));
   }
-    await client.end();
+  await client.end();
 }
 
 run()

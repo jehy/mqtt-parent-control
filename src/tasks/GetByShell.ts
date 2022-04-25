@@ -34,7 +34,7 @@ export default class GetByShell extends Task {
 
   public async end(): Promise<void> {
     const result = (await this.shellResut).stdout.trim();
-    if(this.client) {
+    if (this.client) {
       await this.client.publish(this.config.topic, result);
     }
   }
