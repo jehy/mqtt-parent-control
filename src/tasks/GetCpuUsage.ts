@@ -1,7 +1,7 @@
 import Task from './Task';
 import { getCPULoadAVG } from '../lib/cpu';
 
-import type { TaskOptions } from './Task';
+import type { TaskOptions, TaskType } from './Task';
 
 export type GetCpuUsageConfig = {
   topic: string,
@@ -10,9 +10,11 @@ export type GetCpuUsageConfig = {
 export default class GetCpuUsage extends Task {
   public config: GetCpuUsageConfig;
 
+  public name:TaskType = 'GetCpuUsage';
+
   public command: string;
 
-  public cpuUsage: Promise<number>;
+  public cpuUsage: number;
 
   constructor(config: any, options: TaskOptions) {
     super(options);
@@ -24,11 +26,11 @@ export default class GetCpuUsage extends Task {
   }
 
   public async start():Promise<void> {
-    this.cpuUsage = getCPULoadAVG(1000, 100);
+    this.cpuUsage = await getCPULoadAVG(1000, 100);
   }
 
   public async end(): Promise<void> {
-    const result = (await this.cpuUsage).toString(10);
+    const result = (this.cpuUsage).toString(10);
     if (this.client) {
       await this.client.publish(this.config.topic, result);
     }

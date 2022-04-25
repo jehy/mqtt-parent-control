@@ -29,9 +29,9 @@ export default class TimeControl extends Task {
 
   public config: TimeControlConfig;
 
-  public delay: Promise<boolean>;
+  public delay: boolean;
 
-  public forceOff: Promise<boolean>;
+  public forceOff: boolean;
 
   constructor(config: any, options: TaskOptions) {
     super(options);
@@ -55,28 +55,11 @@ export default class TimeControl extends Task {
     }
   }
 
-  public async start(): Promise<void> {
-    await Promise.all([
-      this.client.subscribe(this.config.topicDelay),
-      this.client.subscribe(this.config.topicForceOff),
-    ]);
-    this.delay = new Promise((resolve) => {
+  public async waitForTopic(waitTopic: string): Promise<boolean> {
+    return new Promise((resolve) => {
       setTimeout(() => resolve(false), 10000);
       this.client.on('message', (topic, message) => {
-        if (topic !== this.config.topicDelay) {
-          return;
-        }
-        if (message.toString() === '1') {
-          resolve(true);
-          return;
-        }
-        resolve(false);
-      });
-    });
-    this.forceOff = new Promise((resolve) => {
-      setTimeout(() => resolve(false), 10000);
-      this.client.on('message', (topic, message) => {
-        if (topic !== this.config.topicForceOff) {
+        if (topic !== waitTopic) {
           return;
         }
         if (message.toString() === '1') {
@@ -88,19 +71,28 @@ export default class TimeControl extends Task {
     });
   }
 
+  public async start(): Promise<void> {
+    await Promise.all([
+      this.client.subscribe(this.config.topicDelay),
+      this.client.subscribe(this.config.topicForceOff),
+    ]);
+    [this.delay, this.forceOff] = await Promise.all([
+      this.waitForTopic(this.config.topicDelay),
+      this.waitForTopic(this.config.topicForceOff),
+    ]);
+  }
+
   public async end(): Promise<void> {
     let shouldShutdown = false;
-    const forceOff = await this.forceOff;
-    if (forceOff) {
+    if (this.forceOff) {
       this.logs.push('shutdown: force mode');
       shouldShutdown = true;
     }
-    const delay = await this.delay;
     const time = parseInt(dayjs().format('HH'), 10);
-    console.log(`Time ${time}`);
+    console.log(`Current time ${time}`);
     const allowedTime = this.config.allowedTime as Array<{ start: number, end: number }>;
     const allowed = allowedTime.find((interval) => interval.start < time && time < interval.end);
-    if (!allowed && !delay) {
+    if (!allowed && !this.delay) {
       this.logs.push('shutdown: not allowed time');
       shouldShutdown = true;
     }

@@ -4,7 +4,6 @@ import { promisify } from 'util';
 import Task from './Task';
 
 import type { TaskOptions } from './Task';
-import type { PromiseWithChild } from 'child_process';
 
 const execAsync = promisify(exec);
 
@@ -17,7 +16,7 @@ export default class GetByShell extends Task {
 
   public command: string;
 
-  public shellResut: PromiseWithChild<{ stdout: string; stderr: string; }>;
+  public shellResut: { stdout: string; stderr: string; };
 
   constructor(config: any, options: TaskOptions) {
     super(options);
@@ -29,11 +28,11 @@ export default class GetByShell extends Task {
   }
 
   public async start():Promise<void> {
-    this.shellResut = execAsync(this.command);
+    this.shellResut = await execAsync(this.command);
   }
 
   public async end(): Promise<void> {
-    const result = (await this.shellResut).stdout.trim();
+    const result = (this.shellResut).stdout.trim();
     if (this.client) {
       await this.client.publish(this.config.topic, result);
     }

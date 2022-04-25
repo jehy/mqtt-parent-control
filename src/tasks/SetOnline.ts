@@ -20,9 +20,7 @@ export default class SetOnline extends Task {
   }
 
   public async start():Promise<void> {
-    if (this.client) {
-      await this.client.publish(this.config.topic, '1');
-    }
+    await this.client.publish(this.config.topic, '1');
   }
 
   end(): Promise<void> {
