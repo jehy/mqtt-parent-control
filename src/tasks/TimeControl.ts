@@ -92,6 +92,7 @@ export default class TimeControl extends Task {
     let shouldShutdown = false;
     const forceOff = await this.forceOff;
     if (forceOff) {
+      this.logs.push('shutdown: force mode');
       shouldShutdown = true;
     }
     const delay = await this.delay;
@@ -100,9 +101,11 @@ export default class TimeControl extends Task {
     const allowedTime = this.config.allowedTime as Array<{ start: number, end: number }>;
     const allowed = allowedTime.find((interval) => interval.start < time && time < interval.end);
     if (!allowed && !delay) {
+      this.logs.push('shutdown: not allowed time');
       shouldShutdown = true;
     }
     if (this.config.onlineOnly && !this.client.connected) {
+      this.logs.push('shutdown: should work online only');
       shouldShutdown = true;
     }
     if (shouldShutdown) {
