@@ -8,6 +8,8 @@ import tasks from './tasks';
 
 import type Task from './tasks/Task';
 import type { TasksConfig, TaskType } from './tasks/Task';
+import {IMQTTAdapter} from "./IMQTTAdapter";
+import {DummyMqttClient} from "./DummyMqttClient";
 
 type Config = {
   mqtt: {
@@ -34,10 +36,18 @@ async function withFallBack(task: Task, fn: Function, logs: Array<string>) {
   }
 }
 
+
+
 async function run() {
-  const { tasksConfig } = config;
+  let client:  IMQTTAdapter; //AsyncMqttClient;//
   let logs:Array<string> = [];
-  const client = mqtt.connect(config.mqtt.url, config.mqtt.options);
+  try{
+    client = mqtt.connect(config.mqtt.url, config.mqtt.options);
+  } catch(err){
+    logs.push('MQTT connect failed', (err as Error).toString());
+    client = new DummyMqttClient();
+  }
+  const { tasksConfig } = config;
   const tasksObjects: Array<Task> = Object.entries(tasksConfig).map((el) => {
     const name: TaskType = el[0] as TaskType;
     const taskConfig: any = el[1];
@@ -57,6 +67,10 @@ async function run() {
   console.log(`${new Date().toString()} running ${tasksObjects.length} tasks`);
 
   const connection = new Promise((resolve) => {
+    if(!client) {
+      resolve(false);
+      return;
+    }
     client.on('connect', () => {
       resolve(true);
     });
@@ -71,9 +85,9 @@ async function run() {
   logs = tasksObjects.reduce((res, task) => res.concat(task.logs), logs);
   if (logs.length) {
     console.log(`${new Date().toString()} ${logs.join('\n')}`);
-    await client.publish(config.logTopic, logs.join('\n'));
+      await client.publish(config.logTopic, logs.join('\n'));
   }
-  await client.end();
+    await client.end();
 }
 
 run()

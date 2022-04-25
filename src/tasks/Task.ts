@@ -2,9 +2,9 @@ import type { CheckProcessConfig } from './CheckProcess';
 import type { GetByShellConfig } from './GetByShell';
 import type { SetOnlineConfig } from './SetOnline';
 import type { TimeControlConfig } from './TimeControl';
-import type { AsyncMqttClient } from 'async-mqtt';
+import {IMQTTAdapter} from "../IMQTTAdapter";
 
-export type TaskOptions = { client: AsyncMqttClient };
+export type TaskOptions = { client: IMQTTAdapter };
 
 export type TaskType = 'CheckProcess' | 'GetNetwork' | 'SetOnline' | 'TimeControl' | 'GetCpuUsage';
 
@@ -25,7 +25,7 @@ export default abstract class Task {
 
   public logs: Array<string>;
 
-  client: AsyncMqttClient;
+  client: IMQTTAdapter;
 
   constructor(options: TaskOptions) {
     this.logs = [];

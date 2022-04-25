@@ -41,6 +41,8 @@ export default class CheckProcess extends Task {
       .trim()
       .split('\n')
       .filter((el) => !el.includes(`grep ${this.config.process}`));
-    await this.client.publish(this.config.topic, result.length === 0 ? '0' : '1');
+    if(this.client) {
+      await this.client.publish(this.config.topic, result.length === 0 ? '0' : '1');
+    }
   }
 }
