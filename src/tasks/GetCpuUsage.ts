@@ -31,8 +31,6 @@ export default class GetCpuUsage extends Task {
 
   public async end(): Promise<void> {
     const result = (this.cpuUsage).toString(10);
-    if (this.client) {
-      await this.client.publish(this.config.topic, result);
-    }
+    await this.client.publish(this.config.topic, result);
   }
 }

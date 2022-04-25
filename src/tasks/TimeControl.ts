@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import dayjs from 'dayjs';
+import pTimeout from 'p-timeout';
 
 import Task from './Task';
 
@@ -57,7 +58,6 @@ export default class TimeControl extends Task {
 
   public async waitForTopic(waitTopic: string): Promise<boolean> {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(false), 10000);
       this.client.on('message', (topic, message) => {
         if (topic !== waitTopic) {
           return;
@@ -72,13 +72,13 @@ export default class TimeControl extends Task {
   }
 
   public async start(): Promise<void> {
-    await Promise.all([
+    await pTimeout(Promise.all([
       this.client.subscribe(this.config.topicDelay),
       this.client.subscribe(this.config.topicForceOff),
-    ]);
+    ]), 10000, () => null);
     [this.delay, this.forceOff] = await Promise.all([
-      this.waitForTopic(this.config.topicDelay),
-      this.waitForTopic(this.config.topicForceOff),
+      pTimeout(this.waitForTopic(this.config.topicDelay), 10000, () => false),
+      pTimeout(this.waitForTopic(this.config.topicForceOff), 10000, () => false),
     ]);
   }
 

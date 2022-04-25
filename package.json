@@ -19,7 +19,8 @@
     "config": "3.3.7",
     "dayjs": "1.11.0",
     "debug": "4.3.4",
-    "mqtt": "4.3.7"
+    "mqtt": "4.3.7",
+    "p-timeout": "4.1.0"
   },
   "devDependencies": {
     "@types/config": "0.0.41",

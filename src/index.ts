@@ -1,8 +1,7 @@
 import * as mqtt from 'async-mqtt';
 // @ts-ignore
 import configModule from 'config';
-// @ts-ignore
-import { promisify } from 'util';
+import pTimeout from 'p-timeout';
 
 import tasks from './tasks';
 import { DummyMqttClient } from './DummyMqttClient';
@@ -25,11 +24,10 @@ type Config = {
 };
 
 const config = configModule as unknown as Config;
-const sleep = (time: number) => promisify(setTimeout)(time);
 
 async function withFallBack(task: Task, fn: Function, logs: Array<string>) {
   try {
-    await fn.apply(task);
+    await pTimeout(fn.apply(task), 30_000);
     // @ts-ignore
   } catch (err: Error) {
     logs.push(`${task.name}: ${err.message} ${err.stack}`);
@@ -40,7 +38,7 @@ async function run() {
   let client: IMQTTAdapter; // AsyncMqttClient;//
   let logs:Array<string> = [];
   try {
-    client = mqtt.connect(config.mqtt.url, config.mqtt.options);
+    client = await pTimeout(mqtt.connectAsync(config.mqtt.url, config.mqtt.options), 10_000);
   } catch (err) {
     logs.push('MQTT connect failed', (err as Error).toString());
     client = new DummyMqttClient();
@@ -77,7 +75,7 @@ async function run() {
       resolve(false);
     });
   });
-  await Promise.race([connection, sleep(10000)]);
+  await pTimeout(connection, 10_000, () => null);
   await Promise.all(tasksObjects.map((task) => withFallBack(task, task.start, logs)));
   console.log('ran start');
   await Promise.all(tasksObjects.map((task) => withFallBack(task, task.end, logs)));
@@ -90,6 +88,6 @@ async function run() {
   await client.end();
 }
 
-run()
+pTimeout(run(), 55_000)
   .then(() => process.exit(0))
   .catch((err) => { console.log(err); process.exit(1); });
