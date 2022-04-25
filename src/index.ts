@@ -1,3 +1,4 @@
+import timers from 'timers/promises';
 import * as mqtt from 'async-mqtt';
 // @ts-ignore
 import configModule from 'config';
@@ -86,6 +87,7 @@ async function run() {
     await client.publish(config.logTopic, logs.join('\n'));
   }
   await client.end();
+  await timers.setTimeout(2000); // wait for may-be-shutdown
 }
 
 pTimeout(run(), 55_000)
