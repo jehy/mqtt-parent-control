@@ -15,13 +15,14 @@ export type TimeControlConfig = {
   topicDelay: string,
   topicForceOff: string,
   onlineOnly: boolean,
+  debug: boolean,
 };
 
-function shutdown() {
-  /* if (true) {
-    console.log('SHUTDOWN');
+function shutdown(debug: boolean = false) {
+  if (debug) {
+    console.log('SHUTDOWN debug');
     return;
-  } */
+  }
   execAsync('shutdown now').catch();
 }
 
@@ -101,7 +102,7 @@ export default class TimeControl extends Task {
       shouldShutdown = true;
     }
     if (shouldShutdown) {
-      setTimeout(() => shutdown(), 1000);
+      setTimeout(() => shutdown(this.config.debug), 1000);
       await this.client.publish(this.config.topicShutdown, '1');
     }
   }
