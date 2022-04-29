@@ -1,12 +1,12 @@
 {
-  "mqtt": {
+  "mqtt": [{
     "options": {
       "clientId": "some-id",
       "username": "name",
       "password": "password"
     },
     "url": "tls://example.com:8883"
-  },
+  }],
   "logTopic": "home/note/logs",
   "tasksConfig": {
     "CheckProcess": {

@@ -12,14 +12,14 @@ import type Task from './tasks/Task';
 import type { TasksConfig, TaskType } from './tasks/Task';
 
 type Config = {
-  mqtt: {
+  mqtt: Array<{
     options: {
       clientId: string,
       username: string,
       password: string
     },
     url: string,
-  }
+  }>
   tasksConfig: TasksConfig,
   logTopic: string,
 };
@@ -35,15 +35,32 @@ async function withFallBack(task: Task, fn: Function, logs: Array<string>) {
   }
 }
 
-async function run() {
-  let client: IMQTTAdapter; // AsyncMqttClient;//
-  let logs:Array<string> = [];
-  try {
-    client = await pTimeout(mqtt.connectAsync(config.mqtt.url, config.mqtt.options), 10_000);
-  } catch (err) {
-    logs.push('MQTT connect failed', (err as Error).toString());
-    client = new DummyMqttClient();
+async function getClient(logs: Array<string>): Promise<IMQTTAdapter> {
+  for (let i = 0; i < config.mqtt.length; i++) {
+    try {
+      const client = await pTimeout(mqtt.connectAsync(config.mqtt[i].url, config.mqtt[i].options), 10_000);
+      const connection = new Promise((resolve, reject) => {
+        client.on('connect', () => {
+          resolve(true);
+        });
+        client.on('error', (err) => {
+          console.log(`${new Date().toString()} error`, err);
+          reject(err);
+        });
+      });
+      await pTimeout(connection, 10_000);
+      return client;
+    } catch (err) {
+      logs.push('MQTT connect failed', (err as Error).toString());
+    }
   }
+  logs.push('Using dummy mqqt client');
+  return new DummyMqttClient();
+}
+
+async function run() {
+  let logs:Array<string> = [];
+  const client: IMQTTAdapter = await getClient(logs);
   const { tasksConfig } = config;
   const tasksObjects: Array<Task> = Object.entries(tasksConfig).map((el) => {
     const name: TaskType = el[0] as TaskType;
@@ -62,21 +79,6 @@ async function run() {
     return task;
   }).filter((el) => el) as Array<Task>;
   console.log(`${new Date().toString()} running ${tasksObjects.length} tasks`);
-
-  const connection = new Promise((resolve) => {
-    if (!client) {
-      resolve(false);
-      return;
-    }
-    client.on('connect', () => {
-      resolve(true);
-    });
-    client.on('error', (err) => {
-      console.log(`${new Date().toString()} error`, err);
-      resolve(false);
-    });
-  });
-  await pTimeout(connection, 10_000, () => null);
   await Promise.all(tasksObjects.map((task) => withFallBack(task, task.start, logs)));
   console.log('ran start');
   await Promise.all(tasksObjects.map((task) => withFallBack(task, task.end, logs)));
