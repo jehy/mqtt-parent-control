@@ -39,16 +39,6 @@ async function getClient(logs: Array<string>): Promise<IMQTTAdapter> {
   for (let i = 0; i < config.mqtt.length; i++) {
     try {
       const client = await pTimeout(mqtt.connectAsync(config.mqtt[i].url, config.mqtt[i].options), 10_000);
-      const connection = new Promise((resolve, reject) => {
-        client.on('connect', () => {
-          resolve(true);
-        });
-        client.on('error', (err) => {
-          console.log(`${new Date().toString()} error`, err);
-          reject(err);
-        });
-      });
-      await pTimeout(connection, 10_000);
       return client;
     } catch (err) {
       logs.push('MQTT connect failed', (err as Error).toString());
