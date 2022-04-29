@@ -73,16 +73,15 @@ export default class TimeControl extends Task {
   }
 
   public async start(): Promise<void> {
+    const res = Promise.all([
+      pTimeout(this.waitForTopic(this.config.topicDelay), 10_000, () => false),
+      pTimeout(this.waitForTopic(this.config.topicForceOff), 10_000, () => false),
+    ]);
     await pTimeout(Promise.all([
       this.client.subscribe(this.config.topicDelay),
       this.client.subscribe(this.config.topicForceOff),
     ]), 10000, () => null);
-    const [delay, forceOff] = await Promise.all([
-      pTimeout(this.waitForTopic(this.config.topicDelay), 10_000, () => false),
-      pTimeout(this.waitForTopic(this.config.topicForceOff), 10_000, () => false),
-    ]);
-    this.delay = delay;
-    this.forceOff = forceOff;
+    [this.delay, this.forceOff] = await res;
   }
 
   public async end(): Promise<void> {
