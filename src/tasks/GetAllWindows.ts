@@ -21,4 +21,19 @@ export default class GetAllWindows extends GetByShell {
     }
     this.command = `su - ${config.user} -c  'DISPLAY=":0" wmctrl -l'`;
   }
+
+  public async end(): Promise<void> {
+    const result = (this.shellResult).stdout.trim()
+      .split('\n')
+      .map((el) => {
+        const all = el.split(' ');
+        return all[all.length - 1];
+      })
+      .sort()
+      .join(' ');
+    if (this.client) {
+      await this.client.publish(this.config.topic, result);
+    }
+  }
+  //
 }
