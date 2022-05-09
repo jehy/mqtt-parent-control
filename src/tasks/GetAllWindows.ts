@@ -27,7 +27,7 @@ export default class GetAllWindows extends GetByShell {
       .split('\n')
       .map((el) => {
         const all = el.split(' ');
-        return all[all.length - 1];
+        return all.slice(3).join(' ');
       })
       .sort()
       .join(' ');
