@@ -16,6 +16,14 @@
     "GetNetwork": {
       "topic": "home/note/net"
     },
+    "GetActiveWindow": {
+      "topic": "home/note/window/active",
+      "user" : "john"
+    },
+    "GetAllWindows": {
+      "topic": "home/note/window/all",
+      "user" : "john"
+    },
     "GetCpuUsage": {
       "topic": "home/note/cpu"
     },

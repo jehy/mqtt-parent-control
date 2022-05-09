@@ -16,7 +16,7 @@ export default class GetByShell extends Task {
 
   public command: string;
 
-  public shellResut: { stdout: string; stderr: string; };
+  public shellResult: { stdout: string; stderr: string; };
 
   constructor(config: any, options: TaskOptions) {
     super(options);
@@ -28,11 +28,11 @@ export default class GetByShell extends Task {
   }
 
   public async start():Promise<void> {
-    this.shellResut = await execAsync(this.command);
+    this.shellResult = await execAsync(this.command);
   }
 
   public async end(): Promise<void> {
-    const result = (this.shellResut).stdout.trim();
+    const result = (this.shellResult).stdout.trim();
     if (this.client) {
       await this.client.publish(this.config.topic, result);
     }

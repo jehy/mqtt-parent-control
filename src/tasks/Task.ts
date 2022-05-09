@@ -1,12 +1,15 @@
+import type { GetAllWindowsConfig } from './GetAllWindows';
 import type { IMQTTAdapter } from '../IMQTTAdapter';
 import type { CheckProcessConfig } from './CheckProcess';
 import type { GetByShellConfig } from './GetByShell';
 import type { SetOnlineConfig } from './SetOnline';
 import type { TimeControlConfig } from './TimeControl';
+import type { GetActiveWindowConfig } from './GetActiveWindow';
 
 export type TaskOptions = { client: IMQTTAdapter };
 
-export type TaskType = 'CheckProcess' | 'GetNetwork' | 'SetOnline' | 'TimeControl' | 'GetCpuUsage';
+export type TaskType = 'CheckProcess' | 'GetNetwork' | 'SetOnline'
+| 'TimeControl' | 'GetCpuUsage' | 'GetActiveWindow' | 'GetAllWindows';
 
 export type TasksConfig = {
   CheckProcess: CheckProcessConfig,
@@ -14,6 +17,8 @@ export type TasksConfig = {
   GetCpuUsage: GetByShellConfig,
   SetOnline: SetOnlineConfig,
   TimeControl: TimeControlConfig,
+  GetAllWindows: GetAllWindowsConfig,
+  GetActiveWindow: GetActiveWindowConfig,
 };
 
 export default abstract class Task {
