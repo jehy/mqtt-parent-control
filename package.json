@@ -17,7 +17,7 @@
   "dependencies": {
     "async-mqtt": "2.6.2",
     "config": "3.3.7",
-    "dayjs": "1.11.0",
+    "dayjs": "1.11.5",
     "debug": "4.3.4",
     "mqtt": "4.3.7",
     "p-timeout": "4.1.0"

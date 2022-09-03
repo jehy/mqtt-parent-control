@@ -36,12 +36,14 @@ async function withFallBack(task: Task, fn: Function, logs: Array<string>) {
 }
 
 async function getClient(logs: Array<string>): Promise<IMQTTAdapter> {
-  for (let i = 0; i < config.mqtt.length; i++) {
-    try {
-      const client = await pTimeout(mqtt.connectAsync(config.mqtt[i].url, config.mqtt[i].options), 10_000);
-      return client;
-    } catch (err) {
-      logs.push('MQTT connect failed', (err as Error).toString());
+  for (let n = 0; n < 3; n++) {
+    for (let i = 0; i < config.mqtt.length; i++) {
+      try {
+        const client = await pTimeout(mqtt.connectAsync(config.mqtt[i].url, config.mqtt[i].options), 10_000);
+        return client;
+      } catch (err) {
+        logs.push(`MQTT connect failed on attempt ${n} to ${config.mqtt[i].url}`, (err as Error).toString());
+      }
     }
   }
   logs.push('Using dummy mqqt client');
