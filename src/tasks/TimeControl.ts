@@ -16,18 +16,6 @@ export type TimeControlConfig = {
   debug: boolean,
 };
 
-function shutdown(debug: boolean = false) {
-  if (debug) {
-    console.log('SHUTDOWN debug');
-    return;
-  }
-  if (isWin) {
-    execAsync('shutdown /s /t 3').catch();
-  } else {
-    execAsync('shutdown now').catch();
-  }
-}
-
 export default class TimeControl extends Task {
   public name:TaskType = 'TimeControl';
 
@@ -56,6 +44,22 @@ export default class TimeControl extends Task {
     if (!this.config.allowedTime) {
       this.enabled = false;
       this.logs.push('allowedTime not found');
+    }
+  }
+
+  public shutdown(debug: boolean = false) {
+    if (debug) {
+      console.log('SHUTDOWN debug');
+      return;
+    }
+    if (isWin) {
+      execAsync('shutdown /s /t 3').catch((err) => {
+        this.logs.push(err.message + err.stack);
+      });
+    } else {
+      execAsync('shutdown now').catch((err) => {
+        this.logs.push(err.message + err.stack);
+      });
     }
   }
 
@@ -105,7 +109,7 @@ export default class TimeControl extends Task {
       shouldShutdown = true;
     }
     if (shouldShutdown) {
-      setTimeout(() => shutdown(this.config.debug), 1000);
+      setTimeout(() => this.shutdown(this.config.debug), 1000);
       await this.client.publish(this.config.topicShutdown, '1');
     }
   }
