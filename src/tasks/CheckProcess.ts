@@ -1,25 +1,24 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { parse } from 'csv-parse/lib/sync';
 
-import Task from './Task';
+import GetByShell from './GetByShell';
+import isWin from '../lib/isWin';
 
 import type { TaskOptions, TaskType } from './Task';
+// const parse = require('csv-parse/lib/sync.js');
 
 export type CheckProcessConfig = {
   process: string,
   topic: string,
+  user: string,
 };
-const execAsync = promisify(exec);
 
-export default class CheckProcess extends Task {
+export default class CheckProcess extends GetByShell {
   public name:TaskType = 'CheckProcess';
-
-  public shellResult: { stdout: string; stderr: string; };
 
   public config: CheckProcessConfig;
 
   constructor(config: any, options: TaskOptions) {
-    super(options);
+    super(config, options);
     this.config = config;
     if (!this.config.topic) {
       this.enabled = false;
@@ -29,17 +28,29 @@ export default class CheckProcess extends Task {
       this.enabled = false;
       this.logs.push('Process name not found');
     }
-  }
-
-  public async start():Promise<void> {
-    this.shellResult = await execAsync(`ps aux | grep ${this.config.process}`);
+    this.command = isWin ? `tasklist /fi "imagename eq ${this.config.process}" /v /nh /fo csv` : `ps aux | grep ${this.config.process}`;
   }
 
   public async end(): Promise<void> {
-    const result = (this.shellResult).stdout
-      .trim()
-      .split('\n')
-      .filter((el) => !el.includes(`grep ${this.config.process}`));
-    await this.client.publish(this.config.topic, result.length === 0 ? '0' : '1');
+    let noResult = false;
+    if (isWin) {
+      const records = parse(this.shellResult.stdout.trim(), {
+        // "Имя образа","PID","Имя сессии","№ сеанса","Память","Состояние","Пользователь","Время ЦП","Заголовок окна"
+        // eslint-disable-next-line no-irregular-whitespace
+        // "powershell.exe","12832","RDP-Tcp#5","1","77 760 КБ","Running","BIG-PC\jehy","0:00:01","Администратор: Windows PowerShell"
+        columns: ['name', 'pid', 'sessionName', 'sessionNum', 'memory', 'state', 'user', 'cpuTime', 'title'],
+        skip_empty_lines: true,
+      }) as Array<{ title: string, user: string }>;
+      noResult = records
+        .filter((rec) => rec && rec.user && rec.user.includes(this.config.user))
+        .length === 0;// remove "no info" message
+    } else {
+      noResult = (this.shellResult).stdout
+        .trim()
+        .split('\n')
+        .filter((el) => !el.includes(`grep ${this.config.process}`))
+        .length === 0;
+    }
+    await this.client.publish(this.config.topic, noResult ? '0' : '1');
   }
 }

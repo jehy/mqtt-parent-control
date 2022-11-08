@@ -1,11 +1,7 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
 import Task from './Task';
+import execAsync from '../lib/execAsync';
 
 import type { TaskOptions } from './Task';
-
-const execAsync = promisify(exec);
 
 export type GetByShellConfig = {
   topic: string,

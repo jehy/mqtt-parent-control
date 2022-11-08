@@ -3,7 +3,7 @@
     "module": "commonjs",
     "isolatedModules": true,
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "esnext",
 
     "strict": true,
     "alwaysStrict": true,

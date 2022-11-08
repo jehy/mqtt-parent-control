@@ -1,13 +1,11 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import dayjs from 'dayjs';
 import pTimeout from 'p-timeout';
 
 import Task from './Task';
+import isWin from '../lib/isWin';
+import execAsync from '../lib/execAsync';
 
 import type { TaskOptions, TaskType } from './Task';
-
-const execAsync = promisify(exec);
 
 export type TimeControlConfig = {
   allowedTime: Array<{ start: number, end: number }>,
@@ -23,7 +21,11 @@ function shutdown(debug: boolean = false) {
     console.log('SHUTDOWN debug');
     return;
   }
-  execAsync('shutdown now').catch();
+  if (isWin) {
+    execAsync('shutdown /s /t 3').catch();
+  } else {
+    execAsync('shutdown now').catch();
+  }
 }
 
 export default class TimeControl extends Task {
@@ -80,7 +82,7 @@ export default class TimeControl extends Task {
     await pTimeout(Promise.all([
       this.client.subscribe(this.config.topicDelay),
       this.client.subscribe(this.config.topicForceOff),
-    ]), 10000, () => null);
+    ]), 10_000, () => null);
     [this.delay, this.forceOff] = await res;
   }
 
