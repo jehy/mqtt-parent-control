@@ -49,7 +49,9 @@ export default class GetAllWindows extends GetByShell {
         skip_empty_lines: true,
       }) as Array<{ title: string, user: string }>;
       return records
-        .filter((rec) => rec && rec.title && rec.title.trim() !== 'N/A' && rec.user.includes(this.config.user))
+        .filter((rec) => rec
+            && rec.title && rec.title.trim() !== 'N/A' && !rec.title.includes('OleMainThread')
+            && rec.user.includes(this.config.user))
         .map((rec) => rec.title).sort().join(' ');
     }
     return data.split('\n')
