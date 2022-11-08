@@ -28,6 +28,10 @@ export default class CheckProcess extends GetByShell {
       this.enabled = false;
       this.logs.push('Process name not found');
     }
+    if (!this.config.user) {
+      this.enabled = false;
+      this.logs.push('User not found');
+    }
     this.command = isWin ? `tasklist /fi "imagename eq ${this.config.process}" /v /nh /fo csv` : `ps aux | grep ${this.config.process}`;
   }
 
