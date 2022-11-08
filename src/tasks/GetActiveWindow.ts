@@ -45,7 +45,7 @@ $w = [apifuncs]::GetForegroundWindow()
 $len = [apifuncs]::GetWindowTextLength($w)
 $sb = New-Object text.stringbuilder -ArgumentList ($len + 1)
 $rtnlen = [apifuncs]::GetWindowText($w,$sb,$sb.Capacity)
-write-host "Window Title: $($sb.tostring())"`;
+write-host "$($sb.tostring())"`;
     } else {
       this.command = `su - ${config.user} -c  'DISPLAY=":0" xdotool getwindowfocus getwindowname'`;
     }

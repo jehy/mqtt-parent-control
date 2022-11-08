@@ -10,8 +10,8 @@ export type GetAllWindowsConfig = {
   user: string,
 };
 
-const winExtraTitles = ['Task', 'Host', 'Window', 'Windows Push Notifications',
-  'Platform', 'Начальный экран', 'Поиск', 'OleMainThread', 'N/A'];
+const winExtraTitles = ['Task', 'Host', 'Windows Push Notifications',
+  'Platform', 'Начальный экран', 'OleMainThread', 'N/A'];
 
 export default class GetAllWindows extends GetByShell {
   public config: GetAllWindowsConfig;
