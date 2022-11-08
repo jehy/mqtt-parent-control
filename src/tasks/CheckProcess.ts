@@ -32,25 +32,29 @@ export default class CheckProcess extends GetByShell {
   }
 
   public async end(): Promise<void> {
-    let noResult = false;
+    const noResult = this.parseReply(this.shellResult.stdout.trim());
+    await this.client.publish(this.config.topic, noResult ? '0' : '1');
+  }
+
+  public parseReply(data:string):boolean {
     if (isWin) {
-      const records = parse(this.shellResult.stdout.trim(), {
+      if (data.split(',').length < 5) {
+        return true;
+      }
+      const records = parse(data, {
         // "Имя образа","PID","Имя сессии","№ сеанса","Память","Состояние","Пользователь","Время ЦП","Заголовок окна"
         // eslint-disable-next-line no-irregular-whitespace
         // "powershell.exe","12832","RDP-Tcp#5","1","77 760 КБ","Running","BIG-PC\jehy","0:00:01","Администратор: Windows PowerShell"
         columns: ['name', 'pid', 'sessionName', 'sessionNum', 'memory', 'state', 'user', 'cpuTime', 'title'],
         skip_empty_lines: true,
       }) as Array<{ title: string, user: string }>;
-      noResult = records
+      return records
         .filter((rec) => rec && rec.user && rec.user.includes(this.config.user))
         .length === 0;// remove "no info" message
-    } else {
-      noResult = (this.shellResult).stdout
-        .trim()
-        .split('\n')
-        .filter((el) => !el.includes(`grep ${this.config.process}`))
-        .length === 0;
     }
-    await this.client.publish(this.config.topic, noResult ? '0' : '1');
+    return data
+      .split('\n')
+      .filter((el) => !el.includes(`grep ${this.config.process}`))
+      .length === 0;
   }
 }

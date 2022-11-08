@@ -13,7 +13,7 @@ export type GetAllWindowsConfig = {
 export default class GetAllWindows extends GetByShell {
   public config: GetAllWindowsConfig;
 
-  public name:TaskType = 'GetAllWindows';
+  public name: TaskType = 'GetAllWindows';
 
   constructor(config: any, options: TaskOptions) {
     super(config, options);
@@ -30,30 +30,34 @@ export default class GetAllWindows extends GetByShell {
   }
 
   public async end(): Promise<void> {
-    let result = '';
+    const result = this.parseReply(this.shellResult.stdout.trim());
+    if (this.client) {
+      await this.client.publish(this.config.topic, result);
+    }
+  }
+
+  public parseReply(data: string): string {
     if (isWin) {
-      const records = parse(this.shellResult.stdout.trim(), {
+      if (data.split(',').length < 5) {
+        return '';
+      }
+      const records = parse(data, {
         // "Имя образа","PID","Имя сессии","№ сеанса","Память","Состояние","Пользователь","Время ЦП","Заголовок окна"
         // eslint-disable-next-line no-irregular-whitespace
         // "powershell.exe","12832","RDP-Tcp#5","1","77 760 КБ","Running","BIG-PC\jehy","0:00:01","Администратор: Windows PowerShell"
         columns: ['name', 'pid', 'sessionName', 'sessionNum', 'memory', 'state', 'user', 'cpuTime', 'title'],
         skip_empty_lines: true,
       }) as Array<{ title: string, user: string }>;
-      result = records
+      return records
         .filter((rec) => rec && rec.title && rec.user.includes(this.config.user))
         .map((rec) => rec.title).sort().join('');
-    } else {
-      result = (this.shellResult).stdout.trim().split('\n')
-        .map((el) => {
-          const all = el.split(' ');
-          return all.slice(3).join(' ');
-        })
-        .sort()
-        .join(' ');
     }
-    if (this.client) {
-      await this.client.publish(this.config.topic, result);
-    }
+    return data.split('\n')
+      .map((el) => {
+        const all = el.split(' ');
+        return all.slice(3).join(' ');
+      })
+      .sort()
+      .join(' ');
   }
-  //
 }
