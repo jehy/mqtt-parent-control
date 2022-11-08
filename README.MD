@@ -5,11 +5,16 @@
 
 Several utilities for parent control over MQTT:
 
-1. Shutdown computer when use in non-allowed time.
-2. Check for running of exact process.
-3. Get CPU Usage.
-4. Get WiFi network
-5. See when computer is online
+1. Shutdown computer when use in non-allowed time
+2. Shutdown computer manually if needed
+3. Check for running of exact process
+4. Get CPU Usage
+5. Get currently used WiFi network
+6. Get currenly active window
+7. Get all open windows
+8. See when computer is online
+
+Windows and Linux supported.
 
 ## Installation
 
