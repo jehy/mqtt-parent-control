@@ -5,16 +5,94 @@
 
 Several utilities for parent control over MQQT:
 
-1. Shutdown computer when use in non allowed time.
-2. Check for running of exact process (Linux only).
+1. Shutdown computer when use in non-allowed time.
+2. Check for running of exact process.
 3. Get CPU Usage.
 4. Get WiFi network
-5. Set online status when computer is turned on
+5. See when computer is online
 
-To use:
+## Installation
+
+### On client
+You need Node.JS installed on your computer.
+
 1. Clone repo
 2. Copy `config/sample.json` to `config/runtime.json`
 3. Edit values in `runtime.json`
 4. Run `npm run build`
 5. Test it with `npm start`
-6. Add it to cron, like `node ./index.js`
+
+
+Then, for **Linux**:
+* Add it to cron, like `node ./build/index.js` and run it every minute
+
+For **Windows**:
+* Add to task scheduler  `run-hidden.exe` from repo root (you can compile it manually from [here](https://github.com/jehy/run-hidden) if you don't trust this exe file)
+ with params like `node build\index.js` and run it every minute after user login via this user's account. `Exe` file is required to run node.js in background.
+
+### On Home Assistant server
+You can use any MQTT integration, but in case you use Home Assistant you can can use folllowing instructions:
+
+Add MQTT devices:
+
+```yaml
+switch:
+  - platform: mqtt
+    unique_id: pc_delay
+    name: "vasya pc delay"
+    command_topic: "home/vasya/pc/delay"
+    payload_on: 1
+    payload_off: 0
+    retain: true
+
+  - platform: mqtt
+    unique_id: pc_off
+    name: "vasya pc forceOff"
+    command_topic: "home/vasya/pc/forceoff"
+    payload_on: 1
+    payload_off: 0
+    retain: true
+
+binary_sensor:
+  - platform: mqtt
+    unique_id: vasya-mimimi
+    name: "vasya mimimi"
+    state_topic: "home/vasya/pc/online"
+    payload_on: "1"
+    device_class: "running"
+    qos: 0
+    expire_after: 120
+
+sensor:
+- platform: mqtt
+  unique_id: vasya-pc-window-active
+  name: "vasya pc window active"
+  state_topic: "home/vasya/pc/window/active"
+  qos: 0
+  expire_after: 120
+
+- platform: mqtt
+  unique_id: vasya-pc-window-all
+  name: "vasya pc window all pc"
+  state_topic: "home/vasya/pc/window/all"
+  qos: 0
+  expire_after: 120
+
+- platform: mqtt
+  unique_id: vasya-pc-wifi
+  name: "vasya pc wifi"
+  state_topic: "home/vasya/pc/net"
+  qos: 0
+  expire_after: 120
+
+- platform: mqtt
+  unique_id: vasya-pc-cpu
+  name: "vasya pc cpu"
+  state_topic: "home/vasya/pc/cpu"
+  unit_of_measurement: '%'
+  qos: 0
+  expire_after: 120
+
+```
+
+Finally, enjoy :)
