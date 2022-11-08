@@ -1,9 +1,9 @@
-# MQQT parent control
+# MQTT parent control
 
 [![Build](https://github.com/jehy/mqtt-parent-control/workflows/Build/badge.svg)](https://github.com/jehy/mqtt-parent-control/actions/workflows/main.yml)
 
 
-Several utilities for parent control over MQQT:
+Several utilities for parent control over MQTT:
 
 1. Shutdown computer when use in non-allowed time.
 2. Check for running of exact process.
@@ -31,7 +31,7 @@ For **Windows**:
  with params like `node build\index.js` and run it every minute after user login via this user's account. `Exe` file is required to run node.js in background.
 
 ### On Home Assistant server
-You can use any MQTT integration, but in case you use Home Assistant you can can use folllowing instructions:
+You can use any MQTT integration, but in case you use Home Assistant you can can use following instructions:
 
 Add MQTT devices:
 
