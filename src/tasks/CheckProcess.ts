@@ -1,4 +1,4 @@
-import { parse } from 'csv-parse/lib/sync';
+import { parse } from 'csv-parse/sync';
 
 import GetByShell from './GetByShell';
 import isWin from '../lib/isWin';
