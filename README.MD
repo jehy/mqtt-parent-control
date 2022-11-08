@@ -14,7 +14,7 @@ Several utilities for parent control over MQQT:
 ## Installation
 
 ### On client
-You need Node.JS installed on your computer.
+You need Node.JS 18 installed on your computer.
 
 1. Clone repo
 2. Copy `config/sample.json` to `config/runtime.json`
