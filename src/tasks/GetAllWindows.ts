@@ -10,6 +10,9 @@ export type GetAllWindowsConfig = {
   user: string,
 };
 
+const winExtraTitles = ['Task', 'Host', 'Window', 'Windows Push Notifications',
+  'Platform', 'Начальный экран', 'Поиск', 'OleMainThread', 'N/A'];
+
 export default class GetAllWindows extends GetByShell {
   public config: GetAllWindowsConfig;
 
@@ -50,7 +53,7 @@ export default class GetAllWindows extends GetByShell {
       }) as Array<{ title: string, user: string }>;
       return records
         .filter((rec) => rec
-            && rec.title && rec.title.trim() !== 'N/A' && !rec.title.includes('OleMainThread')
+            && rec.title && !winExtraTitles.find((el) => rec.title.includes(el))
             && rec.user.includes(this.config.user))
         .map((rec) => rec.title).sort().join(' ');
     }
