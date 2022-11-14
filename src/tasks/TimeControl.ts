@@ -25,6 +25,10 @@ export default class TimeControl extends Task {
 
   public forceOff: boolean;
 
+  public shutDownReason: string;
+
+  public shouldShutdown: boolean;
+
   constructor(config: any, options: TaskOptions) {
     super(options);
     this.config = config;
@@ -90,30 +94,29 @@ export default class TimeControl extends Task {
     [this.delay, this.forceOff] = await res;
   }
 
+  public scheduleShutdown(reason: string) {
+    this.logs.push(`shutdown: ${reason}`);
+    console.log(`shutdown: ${reason}`);
+    this.shutDownReason = reason;
+    this.shouldShutdown = true;
+  }
+
   public async end(): Promise<void> {
-    let shouldShutdown = false;
-    let shutDownReason = '';
     if (this.forceOff) {
-      this.logs.push('shutdown: force mode');
-      shutDownReason = 'force mode';
-      shouldShutdown = true;
+      this.scheduleShutdown('force mode');
     }
     const time = parseInt(dayjs().format('HH'), 10);
     console.log(`Current time ${time}`);
     const allowedTime = this.config.allowedTime as Array<{ start: number, end: number }>;
     const allowed = allowedTime.find((interval) => interval.start < time && time < interval.end);
     if (!allowed && !this.delay) {
-      this.logs.push('shutdown: not allowed time');
-      shutDownReason = 'not allowed time';
-      shouldShutdown = true;
+      this.scheduleShutdown('not allowed time');
     }
     if (this.config.onlineOnly && !this.client.connected) {
-      this.logs.push('shutdown: should work online only');
-      shutDownReason = 'should work online only';
-      shouldShutdown = true;
+      this.scheduleShutdown('shutdown: should work online only');
     }
-    if (shouldShutdown) {
-      setTimeout(() => this.shutdown(this.config.debug, shutDownReason), 1000);
+    if (this.shouldShutdown) {
+      setTimeout(() => this.shutdown(this.config.debug, this.shutDownReason), 1000);
       await this.client.publish(this.config.topicShutdown, '1');
     }
   }
