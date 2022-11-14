@@ -47,9 +47,9 @@ export default class TimeControl extends Task {
     }
   }
 
-  public shutdown(debug: boolean = false) {
+  public shutdown(debug: boolean = false, reason:string = '') {
     if (debug) {
-      console.log('SHUTDOWN debug');
+      console.log(`SHUTDOWN debug reason ${reason}`);
       return;
     }
     if (isWin) {
@@ -92,8 +92,10 @@ export default class TimeControl extends Task {
 
   public async end(): Promise<void> {
     let shouldShutdown = false;
+    let shutDownReason = '';
     if (this.forceOff) {
       this.logs.push('shutdown: force mode');
+      shutDownReason = 'force mode';
       shouldShutdown = true;
     }
     const time = parseInt(dayjs().format('HH'), 10);
@@ -102,14 +104,16 @@ export default class TimeControl extends Task {
     const allowed = allowedTime.find((interval) => interval.start < time && time < interval.end);
     if (!allowed && !this.delay) {
       this.logs.push('shutdown: not allowed time');
+      shutDownReason = 'not allowed time';
       shouldShutdown = true;
     }
     if (this.config.onlineOnly && !this.client.connected) {
       this.logs.push('shutdown: should work online only');
+      shutDownReason = 'should work online only';
       shouldShutdown = true;
     }
     if (shouldShutdown) {
-      setTimeout(() => this.shutdown(this.config.debug), 1000);
+      setTimeout(() => this.shutdown(this.config.debug, shutDownReason), 1000);
       await this.client.publish(this.config.topicShutdown, '1');
     }
   }
