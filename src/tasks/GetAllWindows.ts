@@ -63,6 +63,7 @@ export default class GetAllWindows extends GetByShell {
         return all.slice(3).join(' ');
       })
       .sort()
-      .join(' ');
+      .join(' ')
+      .substring(0, 255);
   }
 }
