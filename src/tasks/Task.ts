@@ -9,7 +9,7 @@ import type { GetActiveWindowConfig } from './GetActiveWindow';
 export type TaskOptions = { client: IMQTTAdapter };
 
 export type TaskType = 'CheckProcess' | 'GetNetwork' | 'SetOnline'
-| 'TimeControl' | 'GetCpuUsage' | 'GetActiveWindow' | 'GetAllWindows';
+| 'TimeControl' | 'GetCpuUsage' | 'GetActiveWindow' | 'GetAllWindows' | 'OnOffControl';
 
 export type TasksConfig = {
   CheckProcess: CheckProcessConfig,

@@ -5,6 +5,7 @@ import SetOnline from './SetOnline';
 import TimeControl from './TimeControl';
 import GetActiveWindow from './GetActiveWindow';
 import GetAllWindows from './GetAllWindows';
+import OnOffControl from './OnOffControl';
 
 export default {
   GetNetwork,
@@ -14,4 +15,5 @@ export default {
   TimeControl,
   GetAllWindows,
   GetActiveWindow,
+  OnOffControl,
 };

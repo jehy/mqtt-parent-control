@@ -1,0 +1,17 @@
+import OnOffControl from './OnOffControl';
+
+import type { TaskOptions } from './Task';
+
+describe('OnOffControl', () => {
+  it('should run commands on on and off', async () => {
+    const fakeClient = {
+      publish: (_topic: string, _taskResult: string) => {
+        // result = taskResult;
+      },
+    };
+    const options: TaskOptions = { client: fakeClient } as TaskOptions;
+    const task = new OnOffControl({ topic: 'dummy', on: 'echo "turned on"', off: 'echo "turned off"' }, options);
+    await task.start();
+    await task.end();
+  });
+});
