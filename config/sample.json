@@ -11,7 +11,8 @@
   "tasksConfig": {
     "CheckProcess": {
       "topic": "home/note/steam",
-      "process": "steam"
+      "process": "steam",
+      "user" : "john"
     },
     "GetNetwork": {
       "topic": "home/note/net"
