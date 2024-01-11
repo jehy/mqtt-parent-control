@@ -75,10 +75,10 @@ async function run() {
   console.log('ran start');
   await Promise.all(tasksObjects.map((task) => withFallBack(task, task.end, logs)));
   console.log('ran end');
-  logs = tasksObjects.reduce((res, task) => res.concat(task.logs), logs);
+  logs = tasksObjects.reduce((res, task) => res.concat(task.logs.map((log) => `${task.name}: ${log}`)), logs);
   if (logs.length) {
     console.log(`${new Date().toString()} ${logs.join('\n')}`);
-    await client.publish(config.logTopic, logs.join('\n'));
+    await client.publish(config.logTopic, logs.join('\n').substring(0, 255));
   }
   await client.end();
   await timers.setTimeout(2000); // wait for may-be-shutdown
