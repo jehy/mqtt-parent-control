@@ -63,7 +63,7 @@ async function run() {
     }
     const task = new tasks[name](taskConfig, { client });
     if (!task.enabled && task.logs) {
-      logs = logs.concat(task.logs);
+      logs = logs.concat(task.logs.map((log) => `${name}: ${log}`));
     }
     if (!task.enabled) {
       return false;
