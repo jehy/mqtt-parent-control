@@ -52,12 +52,15 @@ export default class OnOffControl extends Task {
   }
 
   public async start(): Promise<void> {
-    const res = await pTimeout(this.waitForTopic(this.config.topic), 10_000, () => null);
-    if (res === null) {
+    const res = pTimeout(this.waitForTopic(this.config.topic), 10_000, () => null);
+
+    await pTimeout(this.client.subscribe(this.config.topic), 10_000, () => null);
+    const state = await res;
+    if (state === null) {
       this.logs.push(`Failed to get state of topic ${this.config.topic}`);
       return;
     }
-    this.state = res;
+    this.state = state;
   }
 
   public async end(): Promise<void> {
