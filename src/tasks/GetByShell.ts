@@ -24,11 +24,16 @@ export default class GetByShell extends Task {
   }
 
   public async start():Promise<void> {
-    this.shellResult = await execAsync(this.command);
+    const res = await execAsync(this.command) as { stdout: string; stderr: string; } | undefined;
+    if (!res) { // it can be undefined
+      this.shellResult = { stdout: '', stderr: '' };
+    } else {
+      this.shellResult = res;
+    }
   }
 
   public async end(): Promise<void> {
-    const result = (this.shellResult).stdout.trim();
+    const result = ((this.shellResult)?.stdout || '').trim();
     if (this.client) {
       await this.client.publish(this.config.topic, result);
     }
