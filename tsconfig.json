@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
     "isolatedModules": true,
     "moduleResolution": "node",
     "target": "esnext",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
 
     "strict": true,
     "alwaysStrict": true,

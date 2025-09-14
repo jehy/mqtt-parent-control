@@ -1,9 +1,9 @@
 import pTimeout from 'p-timeout';
 
-import Task from './Task';
-import execAsync from '../lib/execAsync';
+import Task from './Task.ts';
+import execAsync from '../lib/execAsync.ts';
 
-import type { TaskOptions, TaskType } from './Task';
+import type { TaskOptions, TaskType } from './Task.ts';
 
 export type OnOffControlConfig = {
   topic: string,
@@ -52,9 +52,9 @@ export default class OnOffControl extends Task {
   }
 
   public async start(): Promise<void> {
-    const res = pTimeout(this.waitForTopic(this.config.topic), 10_000, () => null);
+    const res = pTimeout(this.waitForTopic(this.config.topic), {milliseconds: 10_000, fallback: () => null});
 
-    await pTimeout(this.client.subscribe(this.config.topic), 10_000, () => null);
+    await pTimeout(this.client.subscribe(this.config.topic), {milliseconds: 10_000, fallback: () => null});
     const state = await res;
     if (state === null) {
       this.logs.push(`Failed to get state of topic ${this.config.topic}`);

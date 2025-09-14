@@ -1,5 +1,5 @@
-import GetByShell from './GetByShell';
-import isWin from '../lib/isWin';
+import GetByShell from './GetByShell.ts';
+import isWin from '../lib/isWin.ts';
 
 import type { TaskOptions, TaskType } from './Task';
 

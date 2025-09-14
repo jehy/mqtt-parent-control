@@ -1,10 +1,10 @@
-import type { GetAllWindowsConfig } from './GetAllWindows';
-import type { IMQTTAdapter } from '../IMQTTAdapter';
-import type { CheckProcessConfig } from './CheckProcess';
-import type { GetByShellConfig } from './GetByShell';
-import type { SetOnlineConfig } from './SetOnline';
-import type { TimeControlConfig } from './TimeControl';
-import type { GetActiveWindowConfig } from './GetActiveWindow';
+import type { GetAllWindowsConfig } from './GetAllWindows.ts';
+import type { IMQTTAdapter } from '../IMQTTAdapter.ts';
+import type { CheckProcessConfig } from './CheckProcess.ts';
+import type { GetByShellConfig } from './GetByShell.ts';
+import type { SetOnlineConfig } from './SetOnline.ts';
+import type { TimeControlConfig } from './TimeControl.ts';
+import type { GetActiveWindowConfig } from './GetActiveWindow.ts';
 
 export type TaskOptions = { client: IMQTTAdapter };
 

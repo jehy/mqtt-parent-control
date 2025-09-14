@@ -1,6 +1,6 @@
-import GetCpuUsage from './GetCpuUsage';
+import GetCpuUsage from './GetCpuUsage.ts';
 
-import type { TaskOptions } from './Task';
+import type { TaskOptions } from './Task.ts';
 
 describe('GetCpuUsage', () => {
   it('should calculate CPU usage', async () => {

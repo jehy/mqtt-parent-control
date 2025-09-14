@@ -1,6 +1,6 @@
 import type { OnConnectCallback, OnErrorCallback, OnMessageCallback } from 'mqtt/types/lib/client';
 import type { ISubscriptionGrant, ISubscriptionMap } from 'mqtt';
-import type { IMQTTAdapter } from './IMQTTAdapter';
+import type { IMQTTAdapter } from './IMQTTAdapter.ts';
 
 export class DummyMqttClient implements IMQTTAdapter {
   connected: boolean;

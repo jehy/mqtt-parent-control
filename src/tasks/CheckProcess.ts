@@ -1,9 +1,9 @@
 import { parse } from 'csv-parse/sync';
 
-import GetByShell from './GetByShell';
-import isWin from '../lib/isWin';
+import GetByShell from './GetByShell.ts';
+import isWin from '../lib/isWin.ts';
 
-import type { TaskOptions, TaskType } from './Task';
+import type { TaskOptions, TaskType } from './Task.ts';
 // const parse = require('csv-parse/lib/sync.js');
 
 export type CheckProcessConfig = {

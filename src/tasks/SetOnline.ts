@@ -1,6 +1,6 @@
-import Task from './Task';
+import Task from './Task.ts';
 
-import type { TaskOptions, TaskType } from './Task';
+import type { TaskOptions, TaskType } from './Task.ts';
 
 export type SetOnlineConfig = {
   topic: string,

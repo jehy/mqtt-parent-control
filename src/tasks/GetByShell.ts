@@ -1,7 +1,7 @@
-import Task from './Task';
-import execAsync from '../lib/execAsync';
+import Task from './Task.ts';
+import execAsync from '../lib/execAsync.ts';
 
-import type { TaskOptions } from './Task';
+import type { TaskOptions } from './Task.ts';
 
 export type GetByShellConfig = {
   topic: string,

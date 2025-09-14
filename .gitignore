@@ -1,7 +1,9 @@
 node_modules/
 .idea
 config/runtime.json
+config/default.json
 build
 dist
 tmp
 coverage
+.vscode

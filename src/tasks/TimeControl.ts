@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 import pTimeout from 'p-timeout';
 
-import Task from './Task';
-import isWin from '../lib/isWin';
-import execAsync from '../lib/execAsync';
+import Task from './Task.ts';
+import isWin from '../lib/isWin.ts';
+import execAsync from '../lib/execAsync.ts';
 
-import type { TaskOptions, TaskType } from './Task';
+import type { TaskOptions, TaskType } from './Task.ts';
 
 export type TimeControlConfig = {
   allowedTime: Array<{ start: number, end: number }>,
@@ -84,13 +84,13 @@ export default class TimeControl extends Task {
 
   public async start(): Promise<void> {
     const res = Promise.all([
-      pTimeout(this.waitForTopic(this.config.topicDelay), 10_000, () => false),
-      pTimeout(this.waitForTopic(this.config.topicForceOff), 10_000, () => false),
+      pTimeout(this.waitForTopic(this.config.topicDelay), {milliseconds: 10_000, fallback: () => false}),
+      pTimeout(this.waitForTopic(this.config.topicForceOff), {milliseconds: 10_000, fallback: () => false}),
     ]);
     await pTimeout(Promise.all([
       this.client.subscribe(this.config.topicDelay),
       this.client.subscribe(this.config.topicForceOff),
-    ]), 10_000, () => null);
+    ]), {milliseconds: 10_000, fallback: () => [false, false]});
     [this.delay, this.forceOff] = await res;
   }
 

@@ -1,7 +1,7 @@
-import Task from './Task';
-import { getCPULoadAVG } from '../lib/cpu';
+import Task from './Task.ts';
+import { getCPULoadAVG } from '../lib/cpu.ts';
 
-import type { TaskOptions, TaskType } from './Task';
+import type { TaskOptions, TaskType } from './Task.ts';
 
 export type GetCpuUsageConfig = {
   topic: string,

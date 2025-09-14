@@ -1,7 +1,7 @@
-import GetByShell from './GetByShell';
-import isWin from '../lib/isWin';
+import GetByShell from './GetByShell.ts';
+import isWin from '../lib/isWin.ts';
 
-import type { TaskOptions, TaskType } from './Task';
+import type { TaskOptions, TaskType } from './Task.ts';
 
 export default class GetNetwork extends GetByShell {
   public name:TaskType = 'GetNetwork';

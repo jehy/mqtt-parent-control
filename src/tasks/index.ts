@@ -1,11 +1,11 @@
-import GetNetwork from './GetNetwork';
-import CheckProcess from './CheckProcess';
-import GetCpuUsage from './GetCpuUsage';
-import SetOnline from './SetOnline';
-import TimeControl from './TimeControl';
-import GetActiveWindow from './GetActiveWindow';
-import GetAllWindows from './GetAllWindows';
-import OnOffControl from './OnOffControl';
+import GetNetwork from './GetNetwork.ts';
+import CheckProcess from './CheckProcess.ts';
+import GetCpuUsage from './GetCpuUsage.ts';
+import SetOnline from './SetOnline.ts';
+import TimeControl from './TimeControl.ts';
+import GetActiveWindow from './GetActiveWindow.ts';
+import GetAllWindows from './GetAllWindows.ts';
+import OnOffControl from './OnOffControl.ts';
 
 export default {
   GetNetwork,
