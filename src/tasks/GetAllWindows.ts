@@ -1,7 +1,7 @@
 import { parse } from 'csv-parse/sync';
 
 import GetByShell from './GetByShell.ts';
-import isWin from '../lib/isWin.ts';
+import isWinPlatform from '../lib/isWin.ts';
 
 import type { TaskOptions, TaskType } from './Task.ts';
 
@@ -11,21 +11,22 @@ export type GetAllWindowsConfig = {
 };
 
 const winExtraTitles = ['Task', 'Host', 'Windows Push Notifications',
-  'Platform', 'Начальный экран', 'OleMainThread', 'N/A'];
+  'Platform', 'Начальный экран', 'OleMainThread', 'N/A', 'Н/Д',
+  'CrossDeviceResumeWindow', 'OLEChannelWnd', 'Quick Settings', 'Search', 'Поиск', 'Пуск'];
 
 export default class GetAllWindows extends GetByShell {
   public config: GetAllWindowsConfig;
 
   public name: TaskType = 'GetAllWindows';
 
-  constructor(config: any, options: TaskOptions) {
+  constructor(config: GetAllWindowsConfig, options: TaskOptions) {
     super(config, options);
     this.config = config;
     if (!this.config.user) {
       this.enabled = false;
       this.logs.push('user not found');
     }
-    if (isWin) {
+    if (isWinPlatform) {
       this.command = 'tasklist  /v /nh /fo csv';
     } else {
       this.command = `su - ${config.user} -c  'DISPLAY=":0" wmctrl -l'`;
@@ -33,14 +34,14 @@ export default class GetAllWindows extends GetByShell {
   }
 
   public async end(): Promise<void> {
-    const result = this.parseReply(this.shellResult.stdout.trim());
+    const result = this.parseReply(this.shellResult.stdout.trim(), isWinPlatform);
     if (this.client) {
       await this.client.publish(this.config.topic, result);
     }
   }
 
-  public parseReply(data: string): string {
-    if (isWin) {
+  public parseReply(data: string, isWinPlatform: boolean): string {
+    if (isWinPlatform) {
       if (data.split(',').length < 5) {
         return '';
       }
@@ -53,9 +54,9 @@ export default class GetAllWindows extends GetByShell {
       }) as Array<{ title: string, user: string }>;
       return records
         .filter((rec) => rec
-            && rec.title && !winExtraTitles.find((el) => rec.title.includes(el))
-            && rec.user.includes(this.config.user))
-        .map((rec) => rec.title).sort().join(' ');
+          && rec.title && !winExtraTitles.find((el) => rec.title.includes(el))
+          && rec.user.includes(this.config.user))
+        .map((rec) => rec.title).sort().join(' | ');
     }
     return data.split('\n')
       .map((el) => {

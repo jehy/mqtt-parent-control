@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`GetAllWindows should be able to parse on WIN 1`] = `"Telegram Web - Google Chrome | Temp Window | Администратор: C:Windowssystem32cmd.exe - tasklist  /v /nh /fo csv"`;
