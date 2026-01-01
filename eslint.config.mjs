@@ -5,6 +5,7 @@ import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
 import tsEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
+import { escape } from "node:querystring";
 // import stylistic from 'eslint-plugin-stylistic';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -62,6 +63,8 @@ export default defineConfig([{
 
         // Deprecated, but not breaking yet
         "@typescript-eslint/no-loss-of-precision": "off",
+        "no-useless-escape": "off",
+        "no-console": "off",
         /// ///////////////
         "max-len": ["error", {
             code: 140,

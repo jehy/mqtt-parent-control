@@ -4,10 +4,8 @@ import type { TaskOptions } from './Task';
 
 describe('GetAllWindows', () => {
   it('should be able to parse on WIN', async () => {
-    let result: string = 'initValue';
     const fakeClient = {
-      publish: (_topic: string, taskResult: string) => {
-        result = taskResult;
+      publish: (_topic: string, _taskResult: string) => {
       },
     };
     const options: TaskOptions = { client: fakeClient } as TaskOptions;
@@ -138,7 +136,7 @@ describe('GetAllWindows', () => {
 "updater.exe","5936","Services","0","17 468 КБ","Unknown","NT AUTHORITY\СИСТЕМА","0:00:00","Н/Д"
 "updater.exe","8776","Services","0","12 564 КБ","Unknown","NT AUTHORITY\СИСТЕМА","0:00:00","Н/Д"
 "tasklist.exe","5376","Console","2","11 448 КБ","Unknown","DESKTOP-I8U3142\jehy","0:00:00","Н/Д"`;
-    const res = task.parseReply(reply, true);
+    const res = task.parseReply(reply);
     expect(res).toMatchSnapshot()
   });
 });

@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import pTimeout from 'p-timeout';
+import {Client} from 'ntp-time';
 
 import Task from './Task.ts';
 import isWin from '../lib/isWin.ts';
@@ -14,6 +15,7 @@ export type TimeControlConfig = {
   topicForceOff: string,
   onlineOnly: boolean,
   debug: boolean,
+  ntpServers?: Array<string>
 };
 
 export default class TimeControl extends Task {
@@ -28,6 +30,8 @@ export default class TimeControl extends Task {
   public shutDownReason: string;
 
   public shouldShutdown: boolean;
+
+  private time: number;
 
   constructor(config: any, options: TaskOptions) {
     super(options);
@@ -86,12 +90,13 @@ export default class TimeControl extends Task {
     const res = Promise.all([
       pTimeout(this.waitForTopic(this.config.topicDelay), {milliseconds: 10_000, fallback: () => false}),
       pTimeout(this.waitForTopic(this.config.topicForceOff), {milliseconds: 10_000, fallback: () => false}),
+      this.getCurrentHours(),
     ]);
     await pTimeout(Promise.all([
       this.client.subscribe(this.config.topicDelay),
       this.client.subscribe(this.config.topicForceOff),
     ]), {milliseconds: 10_000, fallback: () => [false, false]});
-    [this.delay, this.forceOff] = await res;
+    [this.delay, this.forceOff, this.time] = await res;
   }
 
   public scheduleShutdown(reason: string) {
@@ -101,14 +106,29 @@ export default class TimeControl extends Task {
     this.shouldShutdown = true;
   }
 
+  private async getCurrentHours(){
+    const resFromLocalTime = parseInt(dayjs().format('HH'), 10);
+    if(!this.config.ntpServers?.length){
+      return resFromLocalTime
+    }
+    const clients = this.config.ntpServers.map((url) => new Client(url, 123, { timeout: 5000 }));
+    try{
+      const date = await Promise.any(clients.map((client) => client.syncTime()));
+      console.log(`NTP time: ${date.time}`);
+      return parseInt(dayjs(date.time).format('HH'), 10);
+    } catch(err){
+      console.error(err);
+      return resFromLocalTime
+    }
+  }
+
   public async end(): Promise<void> {
     if (this.forceOff) {
       this.scheduleShutdown('force mode');
     }
-    const time = parseInt(dayjs().format('HH'), 10);
-    console.log(`Current time ${time}`);
+    console.log(`Current time ${this.time}`);
     const allowedTime = this.config.allowedTime as Array<{ start: number, end: number }>;
-    const allowed = allowedTime.find((interval) => interval.start < time && time < interval.end);
+    const allowed = allowedTime.find((interval) => interval.start < this.time && this.time < interval.end);
     if (!allowed && !this.delay) {
       this.scheduleShutdown('not allowed time');
     }

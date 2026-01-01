@@ -23,6 +23,7 @@
     "dayjs": "1.11.18",
     "debug": "4.4.3",
     "mqtt": "4.3.8",
+    "ntp-time": "2.1.0",
     "p-timeout": "6.1.4"
   },
   "devDependencies": {

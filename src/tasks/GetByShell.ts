@@ -25,7 +25,7 @@ export default class GetByShell extends Task {
 
   public async start():Promise<void> {
     const res = await execAsync(this.command) as { stdout: string; stderr: string; } | undefined;
-    if (!res) { // it can be undefined
+    if (!res?.stdout) { // it can be undefined
       this.shellResult = { stdout: '', stderr: '' };
     } else {
       this.shellResult = res;

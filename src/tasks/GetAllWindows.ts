@@ -34,13 +34,13 @@ export default class GetAllWindows extends GetByShell {
   }
 
   public async end(): Promise<void> {
-    const result = this.parseReply(this.shellResult.stdout.trim(), isWinPlatform);
+    const result = this.parseReply(this.shellResult?.stdout?.trim()||this.shellResult?.stderr?.trim()||'empty??');
     if (this.client) {
       await this.client.publish(this.config.topic, result);
     }
   }
 
-  public parseReply(data: string, isWinPlatform: boolean): string {
+  public parseReply(data: string): string {
     if (isWinPlatform) {
       if (data.split(',').length < 5) {
         return '';
